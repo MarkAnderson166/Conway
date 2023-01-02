@@ -10,10 +10,11 @@ Basic implementation of Conway's game of life.
 Considering making a bigger game with tkinter just to see how far I can push it.  
 This project is purely to remember tkinter syntax and create movment within the tkinter canvas.  
 
-## result:
+## result
+
 refresh rate not good enough for what I had in mind,  
 This works, but it was pointless.  
 
-TODO:
-start/stop buttons don't work  
-cleanup / refactor  
+TODO:  
+Crashes at the point of stagnation, might fix it one day.  
+Some dead cells aren't deleting properly - didn't find why.  
