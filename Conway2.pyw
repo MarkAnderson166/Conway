@@ -9,10 +9,11 @@ FPS = 60
 
 global GRID_FUTURE
 global GRID_CURRENT
+global COLOR
 
 GRID_CURRENT = [ [0]*RESOLUTION for i in range(RESOLUTION)]
 GRID_FUTURE =  [ [0]*RESOLUTION for i in range(RESOLUTION)]
-
+COLOR = randint(0,2)
 
 class Helpers():
 
@@ -41,7 +42,7 @@ class Tile(pg.sprite.Sprite):
 
   def __init__(self,xCor,yCor):
     self.currentState = 0
-    self.green = 0
+    self.col = 0
     self.xCor = xCor
     self.yCor = yCor
     pg.sprite.Sprite.__init__(self)
@@ -51,9 +52,22 @@ class Tile(pg.sprite.Sprite):
  
   def update(self):
     global GRID_FUTURE
-    self.image.fill((0,self.green,0))
+    global COLOR
     
-    if self.green > 5 and self.currentState == 0 : self.green = self.green*.8
+    if   COLOR == 0:
+      self.image.fill((self.col,0,0))
+    elif COLOR == 1:
+      self.image.fill((0,self.col,0))
+    elif COLOR == 2:
+      self.image.fill((0,0,self.col))
+    elif COLOR == 3:
+      self.image.fill((self.col,self.col,0))
+    elif COLOR == 4:
+      self.image.fill((0,self.col,self.col))
+    else:
+      self.image.fill((self.col,0,self.col))
+    
+    if self.col > 5 and self.currentState == 0 : self.col = self.col*.8
 
     # conways game logic here
     mates = Helpers.countMates(self.xCor,self.yCor)
@@ -67,7 +81,7 @@ class Tile(pg.sprite.Sprite):
   def revive(self):
     global GRID_FUTURE
     GRID_FUTURE[self.xCor][self.yCor] = 1
-    self.green = 200
+    self.col = 200
 
   def getPosX(self):
     return self.xCor
@@ -92,11 +106,11 @@ class Conway:
 
     all_sprites = pg.sprite.Group()
     all_tiles = pg.sprite.Group()
-
     for i in range (0,RESOLUTION,1):
       for j in range(0,RESOLUTION,1):
         tile = Tile(i,j)
         all_tiles.add(tile)
+    all_sprites.add(all_tiles)
 
   
     # main loop
@@ -117,13 +131,15 @@ class Conway:
               if (mouseX == tile.getPosX() and mouseY == tile.getPosY()):
                 tile.revive()
                 print('Clicked tile has: '+str(Helpers.countMates(tile.getPosX(),tile.getPosY()))+' mates')
-          else:
-            print('click in menu area')
+          elif pg.mouse.get_pos()[1] < HEIGHT/2:
+            print('click in menu area - spray')
             for tile in all_tiles:
               if (randint(0,1)): tile.revive()
+          else:
+            print('click in menu area - COLORS!')
+            global COLOR
+            COLOR = randint(0,6)
 
-
-      all_sprites.add(all_tiles)
 
       #Update
       all_sprites.update()
@@ -143,4 +159,3 @@ class Conway:
 
 Conway()
 pg.quit()
-
