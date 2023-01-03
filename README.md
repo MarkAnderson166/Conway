@@ -21,9 +21,8 @@ Some dead cells aren't deleting properly - didn't find why.
 
 # Conway 2  
 
-Same as above, but using pygame library instead of tkinter.
-Looks cool, countMates() needs to pass around HUGE data to work. needs refactor  
+Same as above, but using pygame library instead of tkinter.  
+Looks cool.  
   
 TODO:  
-add seperate global [][] to avoid passing around list of objects  
 menu buttons  
