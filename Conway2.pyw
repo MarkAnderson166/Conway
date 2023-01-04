@@ -1,11 +1,19 @@
 import pygame as pg
 from random import *
 
-WIDTH = 1000
+import numpy as np
+pg.mixer.init(size=32)
+
+
 HEIGHT = 800
 RESOLUTION = 100
 TILE_SIZE = int(HEIGHT/RESOLUTION)
 FPS = 60
+
+global MUSICTEST
+global MUSICTEST2
+MUSICTEST = 0
+MUSICTEST2 = 0
 
 global GRID_FUTURE
 global GRID_CURRENT
@@ -17,24 +25,34 @@ COLOR = randint(0,2)
 
 class Helpers():
 
-    def pixelToGridpos(pixel):
-      return int((pixel/HEIGHT)*RESOLUTION)
+  def pixelToGridpos(pixel):
+    return int((pixel/HEIGHT)*RESOLUTION)
 
-    def gridposToPixel(gridpos):
-      return int((HEIGHT/RESOLUTION)*gridpos)+(TILE_SIZE/2)
+  def gridposToPixel(gridpos):
+    return int((HEIGHT/RESOLUTION)*gridpos)+(TILE_SIZE/2)
 
-    def countMates(x,y):
-      count = 0
-      for i in range(x-1, x+2, 1):
-        for j in range(y-1, y+2, 1):
-          if i == x and j == y:
-            continue
-          try:
-            if GRID_CURRENT[i][j] == 1:
-              count += 1
-          except IndexError:
-                continue
-      return count
+  def countMates(x,y):
+    count = 0
+    for i in range(x-1, x+2, 1):
+      for j in range(y-1, y+2, 1):
+        if i == x and j == y:
+          continue
+        try:
+          if GRID_CURRENT[i][j] == 1:
+            count += 1
+        except IndexError:
+              continue
+    return count
+
+
+  def soundTest(freq):
+    global MUSICTEST, MUSICTEST2
+    MUSICTEST = 60
+    if MUSICTEST2 % 4 == 0:
+      freq = 523
+      print('C!')
+    MUSICTEST2 += 1
+    pg.mixer.Sound(np.sin(2 * np.pi * np.arange(10000) * freq / 44100).astype(np.float32)).play(0)
 
 
 
@@ -99,7 +117,7 @@ class Conway:
   def __init__(self):
     pg.init()
     pg.mixer.init()
-    screen = pg.display.set_mode((WIDTH,HEIGHT))
+    screen = pg.display.set_mode((HEIGHT*1.2,HEIGHT))
 
     pg.display.set_caption("Conway's Py Game")
     clock = pg.time.Clock()
@@ -139,6 +157,9 @@ class Conway:
             print('click in menu area - COLORS!')
             global COLOR
             COLOR = randint(0,6)
+            cMajor = [261,293,329,349,392,440,493,523,587,659,698,784,880,987,1046]
+            Helpers.soundTest(choice(cMajor))
+
 
 
       #Update
@@ -148,6 +169,15 @@ class Conway:
       global GRID_CURRENT
       GRID_CURRENT = [row[:] for row in GRID_FUTURE]  
       for tile in all_tiles:  tile.setNewState()
+
+        # as long as notes play within 60 seconds of each other,
+        # every 4th note will be a C.
+      global MUSICTEST
+      global MUSICTEST2
+      if MUSICTEST > 0:
+        MUSICTEST -= 1
+      else:
+        MUSICTEST2 = 0
 
       keys = pg.key.get_pressed()
 
